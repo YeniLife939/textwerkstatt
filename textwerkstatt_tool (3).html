@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textwerkstatt ✍️</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f3;
+    --cream: #f0ebe0;
+    --teal: #2a7f6f;
+    --teal-light: #e0f2ee;
+    --teal-mid: #3a9f8a;
+    --amber: #c97d2a;
+    --amber-light: #fef3e2;
+    --rose: #c2485a;
+    --rose-light: #fdeef0;
+    --sage: #5a7a5a;
+    --sage-light: #edf3ed;
+    --border: #d8d0c0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 10%, rgba(42,127,111,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(201,125,42,0.05) 0%, transparent 60%);
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  header span.sub {
+    font-size: 0.8rem;
+    opacity: 0.55;
+    font-weight: 300;
+    margin-left: 4px;
+  }
+
+  header .nivel {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  header .nivel label {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  header select {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── THEMEN GRID ── */
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--teal);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .topic-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .topic-btn .emoji { font-size: 1.6rem; }
+
+  .topic-btn:hover {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(42,127,111,0.12);
+  }
+
+  .topic-btn.active {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    color: var(--teal);
+    box-shadow: 0 4px 16px rgba(42,127,111,0.15);
+  }
+
+  /* ── PROMPT CARD ── */
+  .prompt-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+    display: none;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt-card.visible { display: block; }
+
+  .prompt-header {
+    background: var(--teal);
+    color: white;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .prompt-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .new-prompt-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .new-prompt-btn:hover { background: rgba(255,255,255,0.3); }
+
+  .prompt-body { padding: 22px; }
+
+  /* Bild-Impuls Box */
+  .bild-box {
+    background: var(--cream);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .bild-emoji { font-size: 2.2rem; flex-shrink: 0; margin-top: 2px; }
+
+  .bild-desc {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #333;
+    font-style: italic;
+  }
+
+  .bild-desc strong {
+    font-style: normal;
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* Satzanfänge */
+  .starters-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+
+  .starters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .starter {
+    background: var(--amber-light);
+    border-left: 3px solid var(--amber);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.92rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .starter:hover {
+    background: #fde8c8;
+    transform: translateX(3px);
+  }
+
+  .starter .copy-hint {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    white-space: nowrap;
+  }
+
+  /* Wörterhelfer */
+  .worter-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sage);
+    margin-bottom: 10px;
+  }
+
+  .worter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+
+  .chip {
+    background: var(--sage-light);
+    border: 1px solid #c8dac8;
+    color: var(--sage);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover {
+    background: #d8ead8;
+    transform: scale(1.05);
+  }
+
+  /* Grammatik-Tipp */
+  .gramm-box {
+    background: var(--rose-light);
+    border: 1px solid #f0c8cc;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .gramm-box .icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  .gramm-box p {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: #8b3040;
+  }
+
+  .gramm-box strong { font-weight: 600; }
+
+  /* ── SCHREIBBEREICH ── */
+  .write-section {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+    display: none;
+  }
+
+  .write-section.visible { display: block; animation: slideUp 0.3s ease; }
+
+  .write-header {
+    background: var(--ink);
+    color: white;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .write-header h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+  }
+
+  .word-count {
+    font-size: 0.75rem;
+    opacity: 0.5;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    border: none;
+    outline: none;
+    padding: 20px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink);
+    background: #fdfcfa;
+    resize: vertical;
+  }
+
+  .write-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--cream);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: white;
+  }
+
+  .btn-primary:hover { background: #236b5c; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--cream);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { background: var(--border); }
+
+  /* ── KI FEEDBACK ── */
+  .feedback-card {
+    background: white;
+    border: 1.5px solid var(--teal);
+    border-radius: 18px;
+    overflow: hidden;
+    display: none;
+    animation: slideUp 0.3s ease;
+  }
+
+  .feedback-card.visible { display: block; }
+
+  .feedback-header {
+    background: var(--teal-light);
+    border-bottom: 1px solid #b8ddd6;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .feedback-header h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--teal);
+  }
+
+  .feedback-body {
+    padding: 20px 22px;
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #333;
+    white-space: pre-wrap;
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 22px;
+    color: var(--teal);
+    font-size: 0.9rem;
+  }
+
+  .dots span {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+    margin: 0 2px;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* Copied toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--ink);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    transition: transform 0.3s ease;
+    z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.15rem; }
+    .topics-grid { grid-template-columns: repeat(3, 1fr); }
+    .main { padding: 20px 14px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.4rem">✍️</span>
+  <h1>Textwerkstatt <span class="sub">mit KI</span></h1>
+  <div class="nivel">
+    <label>Niveau:</label>
+    <select id="niveauSelect">
+      <option value="A2">A2</option>
+      <option value="A2+" selected>A2+</option>
+      <option value="B1">B1</option>
+    </select>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="section-title">🗂️ Wähle ein Thema</div>
+  <div class="topics-grid" id="topicsGrid"></div>
+
+  <div class="prompt-card" id="promptCard">
+    <div class="prompt-header">
+      <h2 id="promptTitle">Thema</h2>
+      <button class="new-prompt-btn" onclick="generatePrompt()">🔄 Neuer Impuls</button>
+    </div>
+    <div class="prompt-body" id="promptBody">
+      <div class="loading">
+        <div class="dots"><span></span><span></span><span></span></div>
+        Impuls wird geladen…
+      </div>
+    </div>
+  </div>
+
+  <div class="write-section" id="writeSection">
+    <div class="write-header">
+      <h3>✏️ Mein Text</h3>
+      <span class="word-count" id="wordCount">0 Wörter</span>
+    </div>
+    <textarea id="textArea" placeholder="Schreib hier deinen Text…"></textarea>
+    <div class="write-footer">
+      <button class="btn btn-primary" onclick="getFeedback()">🤖 KI-Feedback holen</button>
+      <button class="btn btn-secondary" onclick="clearText()">🗑️ Löschen</button>
+    </div>
+  </div>
+
+  <div class="feedback-card" id="feedbackCard">
+    <div class="feedback-header">
+      <span>🤖</span>
+      <h3>KI-Feedback</h3>
+    </div>
+    <div id="feedbackBody"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✓ In die Zwischenablage kopiert</div>
+
+<script>
+const TOPICS = [
+  { id: "einkaufen", label: "Einkaufen", emoji: "🛒" },
+  { id: "zuhause", label: "Zuhause", emoji: "🏠" },
+  { id: "arbeit", label: "Arbeit", emoji: "💼" },
+  { id: "wetter", label: "Wetter", emoji: "☀️" },
+  { id: "essen", label: "Essen", emoji: "🍽️" },
+  { id: "transport", label: "Bus & Bahn", emoji: "🚌" },
+  { id: "arzt", label: "Beim Arzt", emoji: "🏥" },
+  { id: "freizeit", label: "Freizeit", emoji: "🌳" },
+  { id: "nachbarn", label: "Nachbarn", emoji: "👋" },
+  { id: "jahreszeiten", label: "Jahreszeiten", emoji: "🍂" },
+  { id: "morgen", label: "Morgenroutine", emoji: "☕" },
+  { id: "stadt", label: "Meine Stadt", emoji: "🏙️" },
+];
+
+let activeTopic = null;
+let currentPromptData = null;
+
+// Build topic grid
+const grid = document.getElementById('topicsGrid');
+TOPICS.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'topic-btn';
+  btn.id = 'btn-' + t.id;
+  btn.innerHTML = `<span class="emoji">${t.emoji}</span>${t.label}`;
+  btn.onclick = () => selectTopic(t);
+  grid.appendChild(btn);
+});
+
+function selectTopic(t) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + t.id).classList.add('active');
+  activeTopic = t;
+  document.getElementById('promptTitle').textContent = t.emoji + ' ' + t.label;
+  document.getElementById('feedbackCard').classList.remove('visible');
+  generatePrompt();
+}
+
+async function generatePrompt() {
+  const card = document.getElementById('promptCard');
+  const body = document.getElementById('promptBody');
+  const niveau = document.getElementById('niveauSelect').value;
+
+  card.classList.add('visible');
+  document.getElementById('writeSection').classList.add('visible');
+
+  body.innerHTML = `<div class="loading"><div class="dots"><span></span><span></span><span></span></div> Impuls wird erstellt…</div>`;
+
+  const systemPrompt = `Du bist eine einfühlsame Deutschlehrerin für Erwachsene mit Fluchthintergrund im Pflegebereich. 
+Die Lernenden sind auf Niveau ${niveau} und schreiben lieber über unpersönliche, alltägliche Themen.
+Antworte NUR mit validem JSON, ohne Markdown-Backticks, in diesem Format:
+{
+  "bild": "Eine lebhafte, konkrete Bildbeschreibung einer Alltagsszene zum Thema (3-4 Sätze, ${niveau}-Niveau). Betone visuelle Details.",
+  "satzanfaenge": ["Satzanfang 1...", "Satzanfang 2...", "Satzanfang 3..."],
+  "woerter": ["Wort1", "Wort2", "Wort3", "Wort4", "Wort5", "Wort6", "Wort7", "Wort8"],
+  "grammatik_tipp": "Ein kurzer, einfacher Grammatik-Tipp passend zum Thema auf ${niveau}-Niveau."
+}`;
+
+  const userPrompt = `Erstelle einen Schreibimpuls zum Thema: "${activeTopic.label}". Alle Inhalte auf ${niveau}-Niveau, einfache klare Sprache.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content.map(i => i.text || "").join("");
+    const clean = text.replace(/```json|```/g, "").trim();
+    const d = JSON.parse(clean);
+    currentPromptData = d;
+    renderPrompt(d);
+  } catch(e) {
+    body.innerHTML = `<p style="padding:20px;color:#c44;font-size:0.9rem;">⚠️ Fehler beim Laden. Bitte nochmal versuchen.</p>`;
+  }
+}
+
+function renderPrompt(d) {
+  const body = document.getElementById('promptBody');
+  body.innerHTML = `
+    <div class="bild-box">
+      <span class="bild-emoji">🖼️</span>
+      <div class="bild-desc">${d.bild}</div>
+    </div>
+
+    <div class="starters-title">✏️ Satzanfänge — wähle einen oder schreib frei</div>
+    <div class="starters-list">
+      ${d.satzanfaenge.map(s => `
+        <div class="starter" onclick="insertStarter('${s.replace(/'/g, "\\'")}')">
+          <span>${s}</span>
+          <span class="copy-hint">antippen → einfügen</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="worter-title">📚 Nützliche Wörter</div>
+    <div class="worter-chips">
+      ${d.woerter.map(w => `<span class="chip" onclick="copyWord('${w}')">${w}</span>`).join('')}
+    </div>
+
+    <div class="gramm-box">
+      <span class="icon">💡</span>
+      <p><strong>Grammatik-Tipp:</strong> ${d.grammatik_tipp}</p>
+    </div>
+  `;
+}
+
+function insertStarter(text) {
+  const ta = document.getElementById('textArea');
+  ta.value = text + ' ';
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  updateWordCount();
+}
+
+function copyWord(w) {
+  navigator.clipboard.writeText(w).catch(() => {});
+  showToast(`"${w}" kopiert`);
+}
+
+// Word count
+document.getElementById('textArea').addEventListener('input', updateWordCount);
+function updateWordCount() {
+  const text = document.getElementById('textArea').value.trim();
+  const count = text ? text.split(/\s+/).length : 0;
+  document.getElementById('wordCount').textContent = count + (count === 1 ? ' Wort' : ' Wörter');
+}
+
+function clearText() {
+  document.getElementById('textArea').value = '';
+  updateWordCount();
+  document.getElementById('feedbackCard').classList.remove('visible');
+}
+
+async function getFeedback() {
+  const text = document.getElementById('textArea').value.trim();
+  if (!text || text.length < 10) {
+    showToast("Bitte erst etwas schreiben! ✏️");
+    return;
+  }
+
+  const niveau = document.getElementById('niveauSelect').value;
+  const feedbackCard = document.getElementById('feedbackCard');
+  const feedbackBody = document.getElementById('feedbackBody');
+
+  feedbackCard.classList.add('visible');
+  feedbackBody.innerHTML = `<div class="loading"><div class="dots"><span></span><span></span><span></span></div> KI liest deinen Text…</div>`;
+
+  feedbackCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const systemPrompt = `Du bist eine einfühlsame, ermutigende Deutschlehrerin für Erwachsene mit Fluchthintergrund.
+Die Person lernt auf Niveau ${niveau}. Sie hat möglicherweise wenig Schulerfahrung und ist oft gehemmt.
+Dein Feedback ist IMMER:
+- Zuerst ein echtes Lob (was gut ist)
+- Dann NUR 1-2 konkrete Verbesserungsvorschläge, nicht mehr
+- Kein Rotstift-Stil, sondern ermutigend und warm
+- Einfache Sprache auf ${niveau}-Niveau
+- Auf Deutsch
+Fang an mit einem Emoji und dem Lob.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Bitte gib mir Feedback zu meinem Text:\n\n${text}` }]
+      })
+    });
+
+    const data = await res.json();
+    const feedback = data.content.map(i => i.text || "").join("");
+    feedbackBody.innerHTML = `<div class="feedback-body">${feedback}</div>`;
+  } catch(e) {
+    feedbackBody.innerHTML = `<p style="padding:20px;color:#c44;font-size:0.9rem;">⚠️ Fehler. Bitte nochmal versuchen.</p>`;
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Niveau change regenerates prompt
+document.getElementById('niveauSelect').addEventListener('change', () => {
+  if (activeTopic) generatePrompt();
+});
+</script>
+</body>
+</html>
