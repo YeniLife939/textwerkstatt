@@ -9,7 +9,7 @@ const response = await fetch(
 {
 method: "POST",
 headers: {
-Authorization: Bearer ${HF_TOKEN},
+Authorization: `Bearer ${HF_TOKEN}`,
 "Content-Type": "application/json"
 },
 body: JSON.stringify({
@@ -24,5 +24,4 @@ return {
 statusCode: 200,
 body: JSON.stringify(result)
 };
-
 }
